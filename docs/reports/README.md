@@ -10,7 +10,7 @@ was true when someone ran it. Both are committed, and they are kept separate on 
 
 | Report                                           | Covers                | Spec                                              | Status  |
 | ------------------------------------------------ | --------------------- | ------------------------------------------------- | ------- |
-| `<topic>-report.md`                              | <what phase/slice>    | `../specs/<file>.md`                              | Partial |
+| [`2026-10-27-claude-duty-first-measurements-report.md`](2026-10-27-claude-duty-first-measurements-report.md) | claude-duty.py on 67 real sessions; the 30.8%→1.4% artifact correction | none (precedes any spec) | Partial |
 
 <!-- One row per report. "Status: Partial" is normal and useful — see below. -->
 

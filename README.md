@@ -1,129 +1,87 @@
-# rossoctl/repo-template
+# rossoctl/tool-use-collector
 
-A GitHub **template repository** carrying the rossoctl documentation convention: a `docs/`
-tree where every kind of document has one home and one lifecycle, with CI gates that keep the
-convention from rotting.
+Measure how much of an AI-agent session's lifetime its sandbox actually **runs**, from the
+session logs already on the contributor's laptop — and collect the result as a short, signed,
+text-only report that can be pasted into chat.
 
-Derived from the shape proven in [`rossoctl/moca`](https://github.com/rossoctl/moca), plus an
-append-only `docs/reports/` for measured implementation results.
-
-> **Using this template?** Click **Use this template** above, then follow
-> [Bootstrapping](#bootstrapping) to replace the placeholders. Delete this section and
-> everything above `---` once done, replacing it with your project's own README.
+The question this repo exists to answer: **what is the duty cycle of a sandbox?** Sandbox-host
+density planning (overcommit ratios, idle-snapshot thresholds, migration cost) depends on it,
+nobody can predict it, and public data does not exist. But everyone who runs an agent CLI has
+the raw evidence in `~/.claude` (and, for other agents, their equivalents), with timestamps
+good enough to measure it.
 
 ## What you get
 
-```
-docs/
-├── README.md                  # the router + the lifecycle rules (read this first)
-├── <project>-overview.md      # executive overview — all essential info, kept current
-├── glossary.md
-├── specs/                     # deep designs — revised in place, versioned
-│   ├── README.md              #   the registry: canonical ids + status
-│   └── 0000-spec-template.md
-├── adrs/                      # one decision per file — permanent, immutable
-│   ├── README.md
-│   └── 0000-adr-template.md
-├── reports/                   # what a phase built and measured — append-only
-│   ├── README.md
-│   └── 0000-report-template.md
-├── demos/                     # performed walkthroughs, in acts
-│   └── README.md
-├── notes/                     # investigations, runbooks, dead ends
-│   └── README.md
-└── plans/                     # LOCAL ONLY — gitignored, CI-enforced
-    └── README.md
-```
+One zero-dependency script per agent CLI:
 
-Plus: `CLAUDE.md` (agent instructions for the convention), `GOVERNANCE.md` (pointers to the
-org-level documents), `LICENSE`, `CODEOWNERS`, `CONTRIBUTING.md`, the org lint configs, and a
-`docs` CI workflow.
-
-### The idea in one table
-
-| Artifact     | Answers                              | Lifecycle                            |
-| ------------ | ------------------------------------ | ------------------------------------ |
-| **Overview** | the whole picture, briefly           | kept current                         |
-| **Spec**     | what & why, in depth                 | **revised in place**, versioned      |
-| **ADR**      | one decision + consequences          | **permanent, immutable**             |
-| **Report**   | what was built and **measured**      | **append-only, never rewritten**     |
-| **Demo**     | how to show it working               | updated when commands change         |
-| **Note**     | an investigation, runbook, dead end  | dated, left as-is                    |
-| **Plan**     | how, in what order                   | **local-only — written, run, deleted** |
-
-The two distinctions that carry the most weight:
-
-- **A plan is never committed.** Code is the source of truth for _how_; a committed plan is a
-  stale copy of the code that misleads. Write it → execute it → delete it.
-- **Specs revise, reports do not.** A spec says what _will_ be true and is corrected as you
-  learn. A report says what _was_ true when measured, and is never retro-edited — because its
-  most valuable content is the record of a prediction that turned out wrong.
-
-## Bootstrapping
-
-After creating your repo from this template:
+| Script            | Reads                                     | Status                       |
+| ----------------- | ----------------------------------------- | ---------------------------- |
+| `claude-duty.py`  | `~/.claude/projects/*/*.jsonl`            | tested against real sessions |
 
 ```sh
-# 1. Replace the placeholders. <PROJECT> is the repo name; <TEAM> the owning GitHub team.
-grep -rl --exclude-dir=.git -e '<PROJECT>' -e '<TEAM>' . \
-  | xargs sed -i '' -e 's|<PROJECT>|myrepo|g' -e 's|<TEAM>|myrepo-maintainers|g'
-# (GNU sed: use `sed -i` without the '' argument)
-
-# 2. Rename the overview to match.
-git mv docs/PROJECT-overview.md docs/myrepo-overview.md
-
-# 3. Install the hooks — the commit-msg one enforces the Assisted-By trailer.
-pre-commit install && pre-commit install --hook-type commit-msg
-
-# 4. Check it all still hangs together.
-./scripts/check-no-committed-plans.sh && ./scripts/check-doc-headers.sh
-
-# 5. Protect `main`. DO THIS BEFORE THE FIRST PULL REQUEST.
-#    A template copies files, not settings, so `main` starts wide open — which is how
-#    several rossoctl repos ended up merging PRs with nothing required at all.
-./scripts/protect-main.sh                          # one review + DCO
-./scripts/protect-main.sh --checks DCO,lint,test   # once CI exists, require it too
+./claude-duty.py              # print the signed report block
+./claude-duty.py --list       # per-session table first (local eyeballing)
+./claude-duty.py --days 30    # only sessions touched in the last 30 days
 ```
 
-**Step 5 is the one people skip**, and it is the only step whose absence is invisible:
-nothing fails, PRs just merge unreviewed. `scripts/protect-main.sh --dry-run` prints the
-request without sending it, and `--list-checks` shows the contexts seen on both `main` and
-the latest PR as a starting point — but **only require a check that runs on
-`pull_request`**. A push- or schedule-triggered context never reports on a PR, so the PR
-waits for it forever. A context that appears only in the PR column is `pull_request`-
-triggered; one that appears only on `main` is not, and requiring it will wedge every PR.
+Python 3.7+, standard library only. No install, no network access, no output files.
 
-Then:
+## The report
 
-- Fill in `docs/<project>-overview.md` — it is the front door.
-- Confirm `@rossoctl/<TEAM>` in `CODEOWNERS` exists and has write access, or GitHub ignores
-  the file silently.
-- Add your language's ignores to `.gitignore` and hooks to `.pre-commit-config.yaml` (both
-  have a marked section at the end).
-- Replace this README.
+```text
+-----BEGIN AGENT-DUTY REPORT-----
+tool: claude-duty/1
+machine: f1c9a1e52f60
+sessions: 67
+away-secs: 120
+span-total-h: 1812.6
+tool-total-h: 26.3
+disk-total-h: 24.0
+away-total-h: 1370.1
+duty-aggregate-pct: 1.4
+duty-p50-pct: 2.5
+duty-p90-pct: 52.6
+tooltime-bash-h: 22.1
+tooltime-edit-h: 1.7
+...
+tool-hash: e5615ff97292e7fc
+signature: 2d8cd11254a2d8e2
+-----END AGENT-DUTY REPORT-----
+```
 
-Paths inside the templates that are still placeholders (`` `<file>.md` ``, `` `<topic>-report.md` ``)
-are written as **inline code, not links**, so the link checker has nothing unresolvable to
-chase while the template is still a template. Turn them into real markdown links as you fill
-them in — CI then keeps them honest.
+Paste it back to the collector by any channel. Verify what you receive:
 
-### What the template deliberately leaves out
+```sh
+./claude-duty.py --verify < pasted-report.txt
+```
 
-Issue templates, the PR template and the org-wide security policy are **inherited
-automatically** from [`rossoctl/.github`](https://github.com/rossoctl/.github), so they are not
-duplicated here. `LICENSE` and `CODEOWNERS` _are_ included, because GitHub does not inherit
-those — a repo without a LICENSE is all-rights-reserved whatever the org intends.
+The signature chains the sha256 of the script itself with the report text, so transit garbles
+and hand-edits fail verification. It is accident-proofing, not cryptography — anyone with the
+script can forge a valid report, so treat aggregates as volunteered data, not attested data.
 
-## CI gates
+## Privacy
 
-`.github/workflows/docs.yml` runs on every PR:
+- Reads **only** timestamps, entry types, and tool-call ids/names. Message bodies, file paths
+  and command text are never opened or emitted.
+- The report contains aggregate numbers and a truncated sha256 of the hostname — stable
+  enough to recognize a repeat submission, without broadcasting the hostname itself.
+- No network calls, no file writes. `--verify` works on a machine with no session logs.
 
-| Gate              | What it catches                                                      |
-| ----------------- | -------------------------------------------------------------------- |
-| No committed plans | a plan slipped into a PR; `.gitignore` alone is advisory             |
-| Doc headers        | a spec without `Version:`/`Status:`, an ADR without `Deciders:`, a report without its "not verified" section |
-| Markdown lint      | structural markdown problems (org `.markdownlint-cli2.yaml`)        |
-| Link check         | relative cross-links broken by a rename (org `.lychee.toml`)         |
+## Method — and its known traps
+
+Tool calls are paired by id (`tool_use` → matching `tool_result`); duration is the wall clock
+between them. Three artifacts had to be corrected to get honest numbers, and anyone extending
+this to another agent should expect the same class of problems:
+
+1. **Human-in-the-loop tools** (`AskUserQuestion`, `ExitPlanMode`) measure the *user*
+   deciding, not execution — counted as idle.
+2. **Abandoned sessions**: a tool call whose result is logged hours later (session resumed)
+   is not a hours-long call. Calls over 30 minutes are clamped as hung.
+3. **Read-only vs disk-relevant tools** are separated, since only the latter imply workspace
+   writes.
+
+Full method and caveats: [the overview](docs/tool-use-collector-overview.md); the measured
+results that motivated the clamps: [the report](docs/reports/2026-10-27-claude-duty-first-measurements-report.md).
 
 ---
 

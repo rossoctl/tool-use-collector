@@ -31,6 +31,7 @@ secrets.*
 Thumbs.db
 
 # --- Add your language's ignores below ---
-# Node:   node_modules/ dist/ *.log
-# Python: __pycache__/ .venv/ *.egg-info/
-# Go:     /bin/ go.work.sum
+# Python
+__pycache__/
+*.pyc
+.venv/

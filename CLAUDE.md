@@ -1,14 +1,19 @@
-# <PROJECT> — agent instructions
+# tool-use-collector — agent instructions
 
-<One paragraph: what this repo is, and the one thing an agent most needs to know before
-changing it.>
+Zero-dependency scripts that measure agent-session duty cycle from local transcripts
+(`claude-duty.py` is the first) and emit a signed, paste-safe report block. The one thing to
+know before changing it: **the report text is a signed format** — any change to the report
+lines, number formatting, or the hash inputs changes every report's signature, so treat
+`build_report`/`verify` as a format version, not cosmetics. And the privacy stance is
+load-bearing: the scripts must never read or emit message content, paths, or command text —
+timestamps and tool-call structure only.
 
 ## Repository layout
 
 ```
-<PROJECT>/
+tool-use-collector/
 ├── docs/              # the documentation spine — see docs/README.md
-└── <your code>/
+└── claude-duty.py     # Claude Code adapter: parse, stats, report, --verify
 ```
 
 ## Documentation — where things go
