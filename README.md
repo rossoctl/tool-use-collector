@@ -26,6 +26,26 @@ One zero-dependency script per agent CLI:
 
 Python 3.7+, standard library only. No install, no network access, no output files.
 
+### Dependencies, exactly
+
+Standard-library modules (the complete list, verified by import analysis — nothing else
+is linked, and no external binaries are executed anywhere in the script):
+
+| Module       | Used for                                            |
+| ------------ | --------------------------------------------------- |
+| `argparse`   | CLI options                                         |
+| `datetime`   | transcript timestamps (`fromisoformat`, 3.7+)       |
+| `hashlib`    | machine id, tool-hash, report signature             |
+| `json`       | parsing transcript lines                            |
+| `os`         | path expansion, file mtimes for `--days`            |
+| `socket`     | hostname for the machine id (no `hostname` binary)  |
+| `sys`        | stdin for `--verify`, stderr, exit codes            |
+| `glob`       | finding `~/.claude/projects/*/*.jsonl` (deferred import — `--verify` runs without it) |
+
+Filesystem access is read-only and limited to `~/.claude/projects/` (or `--projects`).
+There is no `subprocess`, no `os.system`, no network code — the zero-dependency claim is
+about the interpreter's own library, not a vendored bundle.
+
 ## The report
 
 ```text
@@ -85,4 +105,4 @@ results that motivated the clamps: [the report](docs/reports/2026-10-27-claude-d
 
 ---
 
-_Assisted-By: Claude Code_
+*Assisted-By: Claude Code*
