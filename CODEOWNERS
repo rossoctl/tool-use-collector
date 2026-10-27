@@ -1,23 +1,23 @@
 # Code owners for tool-use-collector.
 #
 # CODEOWNERS is NOT inherited from the org — GitHub requires it per-repo, so this file must
-# name a real team or the repo gets no review assignment at all.
+# name a real owner or the repo gets no review assignment at all.
 #
-# Replace tool-use-collector-maintainers with the owning team (e.g. @rossoctl/tool-use-collector-maintainers) and make sure the
-# team has write access to this repo, or GitHub silently ignores these rules.
+# Sole-owner repo: @galmasi owns everything. When more committers arrive, swap in a
+# real @rossoctl/ team with write access.
 
 # Default owners for everything
-* @rossoctl/tool-use-collector-maintainers
+* @galmasi
 
 # The documentation convention and its gates. Changes here affect every contributor's
 # workflow, so they get maintainer review.
-/docs/README.md       @rossoctl/tool-use-collector-maintainers
-/docs/specs/README.md @rossoctl/tool-use-collector-maintainers
-/docs/adrs/           @rossoctl/tool-use-collector-maintainers
-/CLAUDE.md            @rossoctl/tool-use-collector-maintainers
+/docs/README.md       @galmasi
+/docs/specs/README.md @galmasi
+/docs/adrs/           @galmasi
+/CLAUDE.md            @galmasi
 
 # CI and governance
-/.github/             @rossoctl/tool-use-collector-maintainers
-/scripts/             @rossoctl/tool-use-collector-maintainers
-/LICENSE              @rossoctl/tool-use-collector-maintainers
-/GOVERNANCE.md        @rossoctl/tool-use-collector-maintainers
+/.github/             @galmasi
+/scripts/             @galmasi
+/LICENSE              @galmasi
+/GOVERNANCE.md        @galmasi
