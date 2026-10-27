@@ -69,7 +69,8 @@ signature: 2d8cd11254a2d8e2
 -----END AGENT-DUTY REPORT-----
 ```
 
-Paste it back to the collector by any channel. Verify what you receive:
+Paste it back to the collector (@galmasi) by any non-permanent channel
+(e.g. slack deletes messages after a time). Verify what you receive:
 
 ```sh
 ./claude-duty.py --verify < pasted-report.txt
@@ -81,11 +82,26 @@ script can forge a valid report, so treat aggregates as volunteered data, not at
 
 ## Privacy
 
-- Reads **only** timestamps, entry types, and tool-call ids/names. Message bodies, file paths
-  and command text are never opened or emitted.
-- The report contains aggregate numbers and a truncated sha256 of the hostname — stable
-  enough to recognize a repeat submission, without broadcasting the hostname itself.
-- No network calls, no file writes. `--verify` works on a machine with no session logs.
+IMPORTANT. While I did everything I could to make sure that your
+  privacy is not compromised by issuing a report with this tool, let's
+  treat the reports themselves as fungible. Do not record them on
+  permanent media if possible: do not add them to github issues. Use
+  email or IMs with known privacy behavior instead.
+
+
+To wit:
+
+- The tool reads **only** timestamps, entry types, and tool-call
+  ids/names. Message bodies, file paths and command text are never
+  opened or emitted.
+
+- The report contains aggregate numbers and a truncated sha256 of the
+  hostname — stable enough to recognize a repeat submission, without
+  broadcasting the hostname itself.
+
+- No network calls, no file writes. `--verify` works on a machine with
+  no session logs.
+
 
 ## Method — and its known traps
 
