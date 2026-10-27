@@ -86,8 +86,7 @@ IMPORTANT. While I did everything I could to make sure that your
   privacy is not compromised by issuing a report with this tool, let's
   treat the reports themselves as fungible. Do not record them on
   permanent media if possible: do not add them to github issues. We
-  have a [Box note]
-  (https://ibm.box.com/s/0kv0cj332u67301gjm20k3vaa79uxh8e) to which
+  have a [Box note](https://ibm.box.com/s/0kv0cj332u67301gjm20k3vaa79uxh8e) to which
   you can append your report.
 
 
